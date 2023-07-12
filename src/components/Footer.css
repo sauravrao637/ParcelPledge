@@ -1,0 +1,80 @@
+.footer-container {
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    padding: 20px;
+    position: relative;
+  }
+  
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .logo-container {
+      margin-right: 20px;
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .logo-highlight {
+      color: #00f;
+    }
+    
+    .subtitle {
+      color: #999;
+    }
+    
+    .subscribe-form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .email-input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #999;
+    }
+    
+    .subscribe-button {
+      background-color: #00f;
+      color: #fff;
+      padding: 10px 20px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .footer-links {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    .section-title {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    ul li {
+      margin-bottom: 10px;
+    }
+    
+    a {
+      color: #fff;
+      text-decoration: none;
+    }
+    
