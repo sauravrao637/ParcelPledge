@@ -10,7 +10,7 @@ import Navbar from "./components/NavBar";
 
 // WEB3 Imports
 import Web3 from 'web3';
-import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER, DEBUG, TESTING_USER_TYPE } from './utils'
+import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER, DEBUG, TESTING_USER_TYPE, generateQRCode } from './utils'
 
 const BigNumber = require('bignumber.js');
 const bnZero = new BigNumber(0);
@@ -50,7 +50,62 @@ function App() {
     if (myType === DEFAULT_USER_TYPE) {
       getMyParcels();
     }
+    parcelShippedListener();
+    parcelLocationUpdatedListener();
   }, [camoParcelInstance, walletAddress])
+
+
+  const parcelShippedListener = async () => {
+    camoParcelInstance.once('ParcelShippedEvent', async (error, event) => {
+      if (error) {
+        console.error(error);
+      } else {
+        const sender = event.returnValues[0];
+        const receiver = event.returnValues[1];
+        const parcelId = event.returnValues[2].toString();
+
+        console.log(`Parcel ${parcelId} shipped from ${sender} to ${receiver}`);
+        if (sender === walletAddress) {
+          const text = sender + " " + receiver + " " + parcelId;
+          const qr_url = await generateQRCode(text);
+          console.log("qr_url:- ", qr_url);
+          // TODO show the shipper parcel has shipped and this url
+        }
+        else if (receiver === walletAddress) {
+          // TODO show the receiver parcel has shipped and its id
+        }
+      }
+    });
+
+  }
+
+  const parcelLocationUpdatedListener = async () => {
+    camoParcelInstance.once('ParcelLocationUpdated', async (error, event) => {
+      if (error) {
+        console.error(error);
+      } else {
+        const partner = event.returnValues[0];
+        const receiver = event.returnValues[1];
+        const parcelId = event.returnValues[2].toString();
+        // TODO show user this event 
+      }
+    });
+  }
+
+  const parcelDeliveredListener = async () => {
+    camoParcelInstance.once('ParcelDeliveredEvent', async (error, event) => {
+      if (error) {
+        console.error(error);
+      } else {
+        const partner = event.returnValues[0];
+        const receiver = event.returnValues[1];
+        const parcelId = event.returnValues[2].toString();
+
+
+        // TODO show user this event
+      }
+    });
+  }
 
   const connectWallet = async () => {
     console.log("connectWallet() called")

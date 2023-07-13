@@ -1,11 +1,11 @@
-const GANCHE = true;
+const GANCHE = false;
 const SHIPPER_ADDR = "0x5f2b6C5BC8d96Cd813e0641aab18504e3b825E8c";
 const PARTNER_ADDR = "0x996d97848c1BccecAe9e3Ba36Eb38Ea4C8112fac";
 
 
 const sendFunds = async (camoParcel, sender) => {
 	console.log("sendFunds() called");
-	const result = await camoParcel.fund.sendTransaction({ from: sender, value: 10 });
+	const result = await camoParcel.fund.sendTransaction({ from: sender, value: "100000000000000000000" });
 	console.log("result: ", result);
 	await checkBalance(camoParcel);
 }

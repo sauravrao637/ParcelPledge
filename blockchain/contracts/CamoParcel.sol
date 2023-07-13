@@ -24,9 +24,9 @@ contract CamoParcel{
     constructor(){
         owner = msg.sender;
     }
-    event ParcelShippedEvent(address, uint);
-    event ParcelLocationUpdated(address, uint);
-    event ParcelDelivered(address, uint);
+    event ParcelShippedEvent(address, address, uint);
+    event ParcelLocationUpdated(address, address, uint);
+    event ParcelDelivered(address, address, uint);
 
     uint parcelId = 0;
     struct Parcel{
@@ -86,7 +86,7 @@ contract CamoParcel{
         userParcels[userAddress].push(parcelId);
         parcels[parcelId] = parcel;
         
-        emit ParcelShippedEvent(userAddress, parcelId);
+        emit ParcelShippedEvent(msg.sender, userAddress, parcelId);
 
         parcelId++;
         return parcelId-1;
@@ -98,7 +98,7 @@ contract CamoParcel{
             require(parcels[pId].status == 0 || parcels[pId].status ==1, "Can't Update location");
             parcels[pId].currentLocation = location;
             parcels[pId].status = 1;
-            emit ParcelLocationUpdated(parcels[pId].receiver, pId);
+            emit ParcelLocationUpdated(msg.sender, parcels[pId].receiver, pId);
         }
     }
 
@@ -118,7 +118,7 @@ contract CamoParcel{
 			bool sent = payable(parcels[pId].receiver).send(compensation);
 			require(sent, "Failed to compensate");
 		}
-		emit ParcelDelivered(parcels[pId].receiver, pId);
+		emit ParcelDelivered(msg.sender, parcels[pId].receiver, pId);
 		return block.timestamp;
     }
 
