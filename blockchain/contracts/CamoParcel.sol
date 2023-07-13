@@ -23,11 +23,10 @@ contract CamoParcel{
     }
     constructor(){
         owner = msg.sender;
-
     }
     event ParcelShippedEvent(address, uint);
-    event ParcelLocationUpdated(uint);
-    event ParcelDelivered(uint);
+    event ParcelLocationUpdated(address, uint);
+    event ParcelDelivered(address, uint);
 
     uint parcelId = 0;
     struct Parcel{
@@ -46,7 +45,13 @@ contract CamoParcel{
     mapping(uint => Parcel) parcels;
 
     function addShipper(address shipper) public onlyOwner{
+        require(!authorisedPartners[shipper], "Partner can't be a shipper");
         authorisedShippers[shipper] = true;
+    }
+
+    function removeAssociate(address user) public onlyOwner(){
+        authorisedPartners[user] = false;
+        authorisedShippers[user] = false;
     }
 
     function removeShipper(address shipper) public onlyOwner{
@@ -54,6 +59,7 @@ contract CamoParcel{
     }
 
     function addPartner(address partner) public onlyOwner{
+        require(!authorisedShippers[partner], "Shipper can't be a partner");
         authorisedPartners[partner] = true;
     }
 
@@ -61,7 +67,8 @@ contract CamoParcel{
         authorisedPartners[partner] = false;
     }
 
-    function shipOrder(string memory itemName, string memory itemDesc, address userAddress, uint expectedDelivery, uint baseCompensation, uint otp) public onlyShipper{
+    function shipOrder(string memory itemName, string memory itemDesc, address userAddress, uint expectedDelivery, uint baseCompensation, uint otp) public onlyShipper returns(uint){
+        require(!authorisedPartners[userAddress] && !authorisedShippers[userAddress], "Invalid address");
         require(expectedDelivery> block.timestamp, "Invalid arguments");
 
         Parcel memory parcel = Parcel(
@@ -82,6 +89,7 @@ contract CamoParcel{
         emit ParcelShippedEvent(userAddress, parcelId);
 
         parcelId++;
+        return parcelId-1;
     }
 
     function updateLocation(uint[] memory pIds, string memory location) public onlyPartner{
@@ -90,7 +98,7 @@ contract CamoParcel{
             require(parcels[pId].status == 0 || parcels[pId].status ==1, "Can't Update location");
             parcels[pId].currentLocation = location;
             parcels[pId].status = 1;
-            emit ParcelLocationUpdated(pId);
+            emit ParcelLocationUpdated(parcels[pId].receiver, pId);
         }
     }
 
@@ -110,7 +118,7 @@ contract CamoParcel{
 			bool sent = payable(parcels[pId].receiver).send(compensation);
 			require(sent, "Failed to compensate");
 		}
-		emit ParcelDelivered(pId);
+		emit ParcelDelivered(parcels[pId].receiver, pId);
 		return block.timestamp;
     }
 
@@ -139,5 +147,12 @@ contract CamoParcel{
 
     function fund() public payable{
         require(msg.value!=0);
+    }
+
+    function getMyType() public view returns (uint16){
+        if (authorisedPartners[msg.sender]) return 1;
+        if(authorisedShippers[msg.sender])  return 0;
+        if(msg.sender == owner) return 999;
+        return 2;
     }
 }
