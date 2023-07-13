@@ -2,7 +2,12 @@ import React from 'react';
 import './List.css';
 
 const List = ({ connectedAddress, myType, myParcels }) => {
-
+  const getStatusString = (status_) => {
+    if (status_ === "0") return "Dispatched";
+    else if (status_ === "1") return "In Transit";
+    else if (status_ === "2") return "Delivered";
+    return "Failed";
+  }
   // const parcels = [
   //   {
   //     id: '1',
@@ -42,7 +47,7 @@ const List = ({ connectedAddress, myType, myParcels }) => {
           <p>Name: {parcel.itemName}</p>
           <p>Description: {parcel.itemDesc}</p>
           <p>Current Location: {parcel.currentLocation}</p>
-          <p>Status: {parcel.status}</p>
+          <p>Status: {getStatusString(parcel.status.toString())}</p>
           <p>Expected Delivery Date: {(new Date(parcel.expectedDelivery.toString() * 1000).toLocaleString())}</p>
           <p>OTP: {parcel.otp.toString()}</p>
         </div>
