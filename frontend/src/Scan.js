@@ -1,6 +1,5 @@
 import React, { useRef } from 'react';
 import './Scan.css';
-import Navbar from './components/NavBar';
 
 const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation }) => {
   const videoRef = useRef(null);
@@ -46,7 +45,6 @@ const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation })
 
   return (
     <div className="parcel-container">
-      <Navbar connectedAddress={connectedAddress} />
       <div className="scan-parcel-box" onClick={handleScanParcel}>
         <h2>Scan Parcel</h2>
       </div>

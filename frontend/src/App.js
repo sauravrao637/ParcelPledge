@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Create from './Create';
 import Scan from './Scan';
 import List from './List';
+import Navbar from "./components/NavBar";
 
 // WEB3 Imports
 import Web3 from 'web3';
@@ -261,6 +262,7 @@ function App() {
 
     <div className="App">
       <Router>
+        <Navbar connectedAddress={walletAddress} />
         <Routes>
           <Route path="/" element={<Home connectedAddress={walletAddress} />} />
 

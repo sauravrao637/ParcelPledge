@@ -1,14 +1,12 @@
 import React from "react";
 import "./Create.css";
-import Navbar from "./components/NavBar";
-import Footer from "./components/Footer";
+
 import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER } from './utils';
 
 const Create = ({ connectedAddress, myType, shipOrder, getParcel }) => {
 
   return (
     <div>
-      <Navbar connectedAddress={connectedAddress} />
       <br></br>
       <div>
         {
