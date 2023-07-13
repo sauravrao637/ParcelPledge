@@ -65,7 +65,7 @@ const Create = ({ connectedAddress, myType, shipOrder, getParcel }) => {
                 <h2>Create New Freight Request</h2>
                 <form className="section" onSubmit={(event) => event.preventDefault()}>
                   <div className="form-field">
-                    <label htmlFor="itemName">Item Name</label>
+                    <label htmlFor="itemName" onChange={(event) => setItemName(event.target.value)}>Item Name</label>
                     <input
                       type="text"
                       id="itemName"
