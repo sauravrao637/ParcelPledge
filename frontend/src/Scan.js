@@ -1,7 +1,25 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import './Scan.css';
 
 const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation }) => {
+  const [parcelId, setParcelId] = useState('');
+  const [otpValue, setOtpValue] = useState('');
+  const updateLoc = () => {
+    if (navigator.geolocation) {
+      let location_ = '';
+      navigator.geolocation.getCurrentPosition((position) => {
+        location_ = "" + position.coords.latitude + ',' + '' + position.coords.longitude;
+        console.log("location_ =", location_);
+      });
+      updateLocation([parcelId], location_);
+    } else {
+      console.error('Geolocation is not supported by this browser');
+    }
+  }
+
+  const markDelivered = () => {
+    markParcelDelivered(parcelId, otpValue);
+  }
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -37,19 +55,19 @@ const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation })
     }
   };
 
-  const handleUpdateLocation = () => {
-  };
-
-  const handleMarkDelivered = () => {
-  };
-
   return (
     <div className="parcel-container">
       <div className="scan-parcel-box" onClick={handleScanParcel}>
         <h2>Scan Parcel</h2>
       </div>
       <div className="parcel-id-box">
-        <h3>Parcel ID: 123456</h3>
+        <input
+          type="text"
+          id="parcelId"
+          className="name-input"
+          placeholder="ParcelId"
+          onChange={(event) => setParcelId(event.target.value)}
+        />
       </div>
       <div className="action-buttons">
         <button onClick={handleCapturePicture}>Capture Picture</button>
@@ -61,10 +79,16 @@ const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation })
         <canvas className="canvas" ref={canvasRef} />
       </div>
       <div className="action-buttons">
-        <button onClick={handleUpdateLocation}>Update Location</button>
-        <button onClick={handleMarkDelivered}>Mark Delivered</button>
+        <button onClick={updateLoc}>Update Location</button>
+        <button onClick={markDelivered}>Mark Delivered</button>
         <div className="parcel-id-box">
-          <h3>OTP: 123456</h3>
+          <input
+            type="text"
+            id="otp_value"
+            className="name-input"
+            placeholder="OTP"
+            onChange={(event) => setOtpValue(event.target.value)}
+          />
         </div>
       </div>
     </div>
