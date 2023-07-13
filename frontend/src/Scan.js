@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import './Scan.css';
 import Navbar from './components/NavBar';
 
-const Scan = ({ connectedAddress }) => {
+const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 

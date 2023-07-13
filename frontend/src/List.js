@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from "./components/NavBar";
 import './List.css';
 
-const List = ({ connectedAddress }) => {
+const List = ({ connectedAddress, myType, myParcels }) => {
   const parcels = [
     {
       id: '1',

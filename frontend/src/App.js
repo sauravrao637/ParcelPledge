@@ -25,6 +25,7 @@ function App() {
 
   // contract variables
   const [myType, setMyType] = useState(DEFAULT_USER_TYPE);
+  const [myParcels, setMyParcels] = useState([]);
 
   useEffect(() => {
     connectWallet();
@@ -45,7 +46,9 @@ function App() {
       return;
     }
     getMyType();
-
+    if (myType === DEFAULT_USER_TYPE) {
+      getMyParcels();
+    }
   }, [camoParcelInstance, walletAddress])
 
   const connectWallet = async () => {
@@ -151,7 +154,8 @@ function App() {
     console.log("getMyParcels() called");
     try {
       const result = await camoParcelInstance.methods.viewMyParcels().call({ from: window.web3.currentProvider.selectedAddress });
-      // TODO set list of parcels
+      console.log(result);
+      setMyParcels(result);
       console.log(result);
     } catch (error) {
       console.error(error);
@@ -241,13 +245,15 @@ function App() {
     }
   }
 
-  const viewParcel = async (parcelId) => {
+  const getParcel = async (parcelId) => {
     console.log("viewParcel(_) called ,", parcelId);
     try {
       const result = await camoParcelInstance.methods.viewParcel(parcelId).call({ from: window.web3.currentProvider.selectedAddress });
       console.log(result);
+      return result;
     } catch (error) {
       console.error(error);
+      return error;
     }
   }
 
@@ -257,9 +263,12 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home connectedAddress={walletAddress} />} />
-          <Route path="/shipper" element={<Create connectedAddress={walletAddress} myType={myType} />} />
-          <Route path="/partner" element={<Scan connectedAddress={walletAddress} />} />
-          <Route path="/myparcels" element={<List connectedAddress={walletAddress} />} />
+
+          <Route path="/shipper" element={<Create connectedAddress={walletAddress} myType={myType} shipOrder={shipOrder} />} getParcel={getParcel} />
+
+          <Route path="/partner" element={<Scan connectedAddress={walletAddress} myType={myType} markParcelDelivered={markParcelDelivered} updateLocation={updateLocation} />} />
+
+          <Route path="/myparcels" element={<List connectedAddress={walletAddress} myType={myType} myParcels={myParcels} />} />
         </Routes>
       </Router>
     </div>
