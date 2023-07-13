@@ -7,10 +7,12 @@ import Create from './Create';
 import Scan from './Scan';
 import List from './List';
 import Navbar from "./components/NavBar";
+import { useToast } from '@chakra-ui/react';
+
 
 // WEB3 Imports
 import Web3 from 'web3';
-import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER, DEBUG, TESTING_USER_TYPE, generateQRCode } from './utils'
+import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER, DEBUG, TESTING_USER_TYPE, generateQRCode } from './utils';
 
 const BigNumber = require('bignumber.js');
 const bnZero = new BigNumber(0);
@@ -27,6 +29,7 @@ function App() {
   // contract variables
   const [myType, setMyType] = useState(DEFAULT_USER_TYPE);
   const [myParcels, setMyParcels] = useState([]);
+  const toast = useToast();
 
   useEffect(() => {
     connectWallet();
@@ -70,9 +73,23 @@ function App() {
           const qr_url = await generateQRCode(text);
           console.log("qr_url:- ", qr_url);
           // TODO show the shipper parcel has shipped and this url
+          toast({
+            title: 'Parcel Shipped',
+            description: `Your parcel with ID ${parcelId} has been shipped to ${receiver}`,
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
         }
         else if (receiver === walletAddress) {
           // TODO show the receiver parcel has shipped and its id
+          toast({
+            title: 'Parcel Shipped',
+            description: `You have received a parcel with ID ${parcelId} from ${sender}`,
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          });
         }
       }
     });
@@ -88,9 +105,17 @@ function App() {
         const receiver = event.returnValues[1];
         const parcelId = event.returnValues[2].toString();
         // TODO show user this event 
+        toast({
+          title: 'Parcel Location Updated',
+          description: `Parcel with ID ${parcelId} has been updated by ${partner}`,
+          status: 'info',
+          duration: 5000,
+          isClosable: true,
+        });
       }
     });
   }
+
 
   const parcelDeliveredListener = async () => {
     camoParcelInstance.once('ParcelDeliveredEvent', async (error, event) => {
@@ -103,6 +128,13 @@ function App() {
 
 
         // TODO show user this event
+        toast({
+          title: 'Parcel Delivered',
+          description: `Parcel with ID ${parcelId} has been delivered by ${partner}`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
       }
     });
   }
