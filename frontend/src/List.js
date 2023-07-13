@@ -2,7 +2,7 @@ import React from 'react';
 import Navbar from "./components/NavBar";
 import './List.css';
 
-const List = () => {
+const List = ({ connectedAddress }) => {
   const parcels = [
     {
       id: '1',
@@ -35,7 +35,7 @@ const List = () => {
 
   return (
     <div className="parcel-container">
-        <Navbar />
+      <Navbar connectedAddress={connectedAddress} />
       {parcels.map((parcel) => (
         <div className="parcel-box" key={parcel.id}>
           <h2>ID: {parcel.id}</h2>

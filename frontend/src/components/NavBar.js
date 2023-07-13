@@ -3,24 +3,8 @@ import { ChakraProvider, Box, Flex, Button } from "@chakra-ui/react";
 import { FaWallet } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 
-const Navbar = () => {
-  const [connectedAddress, setConnectedAddress] = useState('');
+const Navbar = ({ connectedAddress }) => {
 
-  const handleOpenMetamask = () => {
-    if (window.ethereum) {
-      window.ethereum
-        .request({ method: 'eth_requestAccounts' })
-        .then((accounts) => {
-          console.log('Metamask accounts:', accounts);
-          setConnectedAddress(accounts[0]);
-        })
-        .catch((error) => {
-          console.error('Metamask account access error:', error);
-        });
-    } else {
-      console.error('Metamask not found');
-    }
-  };
 
   return (
     <Flex
@@ -37,7 +21,7 @@ const Navbar = () => {
       left={0}
       backdropFilter="blur(10px)"
       zIndex={1}
-      bg="rgba(0, 0, 0, 0.5)" 
+      bg="rgba(0, 0, 0, 0.5)"
     >
       <Box>
         <Box as="span" fontSize="xl" fontWeight="bold">
@@ -66,7 +50,7 @@ const Navbar = () => {
           </Button>
         </Link>
 
-        <Link to="/create">
+        <Link to="/shipper">
           <Button
             as="a"
             href="/"
@@ -81,7 +65,7 @@ const Navbar = () => {
           </Button>
         </Link>
 
-        <Link to="/scan">
+        <Link to="/partner">
           <Button
             as="a"
             href="/"
@@ -97,7 +81,7 @@ const Navbar = () => {
           </Button>
         </Link>
 
-        <Link to="/list">
+        <Link to="/myparcels">
           <Button
             as="a"
             href="/"
@@ -117,9 +101,7 @@ const Navbar = () => {
           {connectedAddress ? connectedAddress.slice(0, 6) + '...' + connectedAddress.slice(-4) : ''}
         </Box>
 
-        <div onClick={handleOpenMetamask}>
-          <FaWallet size={24} />
-        </div>
+        <FaWallet size={24} />
 
       </Box>
     </Flex>

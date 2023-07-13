@@ -6,11 +6,11 @@ import Navbar from "./components/NavBar"
 import Footer from "./components/Footer";
 
 
-const Home = () => {
+const Home = ({ contract_url, connectedAddress }) => {
   return (
     <>
-    <Navbar/>
-    <Hero/>
+      <Navbar connectedAddress={connectedAddress} />
+      <Hero contract_url={contract_url} />
     </>
   );
 };

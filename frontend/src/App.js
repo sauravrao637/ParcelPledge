@@ -9,15 +9,12 @@ import List from './List';
 
 // WEB3 Imports
 import Web3 from 'web3';
-import { addrParcel, CHAIN_PARAMS } from './utils'
+import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER, DEBUG, TESTING_USER_TYPE } from './utils'
 
 const BigNumber = require('bignumber.js');
 const bnZero = new BigNumber(0);
 
-const DEFAULT_USER_TYPE = 2;
-const TYPE_SHIPPER = 0;
-const TYPE_PARTNER = 1;
-const TYPE_OWNER = 999;
+
 
 function App() {
 
@@ -47,7 +44,6 @@ function App() {
       console.error("camoParcelInstance is NULL")
       return;
     }
-    // TODO
     getMyType();
 
   }, [camoParcelInstance, walletAddress])
@@ -128,9 +124,14 @@ function App() {
   const getMyType = async () => {
     console.log("getMyType() called");
     try {
-      const result = await camoParcelInstance.methods.getMyType(window.web3.currentProvider.selectedAddress).call();
+      const result = await camoParcelInstance.methods.getMyType().call({ from: window.web3.currentProvider.selectedAddress });
       console.log("myType = ", result);
-      setMyType(result);
+      if (DEBUG) {
+        setMyType(TESTING_USER_TYPE);
+      } else {
+        setMyType(result.toString());
+      }
+
     } catch (error) {
       console.error(error);
     }
@@ -229,7 +230,7 @@ function App() {
   }
 
   // ---->Shipper
-  const shipOrder = async () => {
+  const shipOrder = async (itemName, itemDesc, userAddress, expectedDelivery, baseCompensation, otp) => {
     console.log("shipOrder() called,");
     try {
       const result = await camoParcelInstance.methods.shipOrder(itemName, itemDesc, userAddress, expectedDelivery, baseCompensation, otp).send({ from: window.web3.currentProvider.selectedAddress })
@@ -251,13 +252,14 @@ function App() {
   }
 
   return (
+
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/shipper" element={<Create />} />
-          <Route path="/partner" element={<Scan />} />
-          <Route path="/myparcels" element={<List />} />
+          <Route path="/" element={<Home connectedAddress={walletAddress} />} />
+          <Route path="/shipper" element={<Create connectedAddress={walletAddress} myType={myType} />} />
+          <Route path="/partner" element={<Scan connectedAddress={walletAddress} />} />
+          <Route path="/myparcels" element={<List connectedAddress={walletAddress} />} />
         </Routes>
       </Router>
     </div>

@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import './Scan.css';
 import Navbar from './components/NavBar';
 
-const Scan = () => {
+const Scan = ({ connectedAddress }) => {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -46,7 +46,7 @@ const Scan = () => {
 
   return (
     <div className="parcel-container">
-      <Navbar />
+      <Navbar connectedAddress={connectedAddress} />
       <div className="scan-parcel-box" onClick={handleScanParcel}>
         <h2>Scan Parcel</h2>
       </div>
@@ -68,7 +68,7 @@ const Scan = () => {
         <div className="parcel-id-box">
           <h3>OTP: 123456</h3>
         </div>
-    </div>
+      </div>
     </div>
   );
 };

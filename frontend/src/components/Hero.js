@@ -6,7 +6,10 @@ import backgroundImg from './dark.jpg';
 import heroImg from './parcel.jpg';
 import { Link } from 'react-router-dom';
 
-const Hero = () => {
+const Hero = ({ contract_url }) => {
+
+  // TODO add view contract on explorer
+
   return (
     <>
       <Box
@@ -34,8 +37,8 @@ const Hero = () => {
               />
             </Heading>
             <Text fontSize="2xl" mb={8} fontFamily="Arial">
-            Our platform combines smart contracts, IoT, and AI to revolutionize logistics. With the added feature of image hosting on the IPFS, our platform for efficient and secure parcel tracking.</Text>
-            <Link to="/create">
+              Our platform combines smart contracts, IoT, and AI to revolutionize logistics. With the added feature of image hosting on the IPFS, our platform for efficient and secure parcel tracking.</Text>
+            <Link to="/shipper">
               <Button
                 colorScheme="teal"
                 mr={4}
@@ -48,7 +51,7 @@ const Hero = () => {
             </Link>
 
 
-            <Link to="/scan">
+            <Link to="/partner">
               <Button
                 colorScheme="teal"
                 variant="outline"
@@ -101,7 +104,7 @@ const Hero = () => {
           <Box className="footer-content">
             <Box className="logo-container">
               <Heading as="h4" className="logo" size="md">
-              Web3Berlin<span className="logo-highlight">Hackathon</span>
+                Web3Berlin<span className="logo-highlight">Hackathon</span>
               </Heading>
             </Box>
             <Box className="subscribe-form">
