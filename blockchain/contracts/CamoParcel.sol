@@ -67,7 +67,7 @@ contract CamoParcel{
         authorisedPartners[partner] = false;
     }
 
-    function shipOrder(string memory itemName, string memory itemDesc, address userAddress, uint expectedDelivery, uint baseCompensation, uint otp) public onlyShipper returns(uint){
+    function shipOrder(string memory itemName, string memory itemDesc, address userAddress, uint expectedDelivery, uint baseCompensation, uint otp) public onlyShipper{
         require(!authorisedPartners[userAddress] && !authorisedShippers[userAddress], "Invalid address");
         require(expectedDelivery> block.timestamp, "Invalid arguments");
 
@@ -89,7 +89,6 @@ contract CamoParcel{
         emit ParcelShippedEvent(msg.sender, userAddress, parcelId);
 
         parcelId++;
-        return parcelId-1;
     }
 
     function updateLocation(uint[] memory pIds, string memory location) public onlyPartner{
@@ -108,7 +107,7 @@ contract CamoParcel{
         return difDays*baseCompensation;
     }
 
-    function markParcelDelivered(uint pId, uint otp) public onlyPartner returns(uint256) {
+    function markParcelDelivered(uint pId, uint otp) public onlyPartner {
         require(otp == parcels[pId].otp, "Invalid");
         require(parcels[pId].status == 0 || parcels[pId].status == 1,"Invalid");
         parcels[pId].currentLocation = "Delivered";
@@ -119,7 +118,6 @@ contract CamoParcel{
 			require(sent, "Failed to compensate");
 		}
 		emit ParcelDelivered(msg.sender, parcels[pId].receiver, pId);
-		return block.timestamp;
     }
 
     function viewMyParcels() public view returns (Parcel[] memory) {

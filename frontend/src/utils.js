@@ -1,4 +1,4 @@
-const addrParcel = "0x2A0D1C191a59AA99041de69d2a9D4B3F6b88D768"
+const addrParcel = "0xc2Ae7c483088874e92BB8Cc30678e505745d396a";
 const DEFAULT_USER_TYPE = "2";
 const TYPE_SHIPPER = "0";
 const TYPE_PARTNER = "1";
