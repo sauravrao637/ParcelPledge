@@ -81,7 +81,7 @@ const Navbar = ({ myType, connectedAddress }) => {
           </Link>
         }
         {
-          (myType === DEFAULT_USER_TYPE || myType == TYPE_PARTNER) &&
+          (myType === DEFAULT_USER_TYPE || myType === TYPE_PARTNER) &&
           < Link to="/partner">
             <Button
               as="a"

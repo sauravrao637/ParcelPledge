@@ -17,8 +17,7 @@ import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER
 
 const BigNumber = require('bignumber.js');
 const bnZero = new BigNumber(0);
-
-
+const processedEvents = [];
 
 function App() {
 
@@ -54,93 +53,56 @@ function App() {
     if (myType === DEFAULT_USER_TYPE) {
       getMyParcels();
     }
-    parcelShippedListener();
-    parcelLocationUpdatedListener();
-    parcelDeliveredListener();
   }, [camoParcelInstance, walletAddress])
 
 
-  const parcelShippedListener = async () => {
-    camoParcelInstance.once('ParcelShippedEvent', async (error, event) => {
-      if (error) {
-        console.error(error);
-      } else {
-        console.log("event: ", event);
-        const sender = event.returnValues[0];
-        const receiver = event.returnValues[1];
-        const parcelId = event.returnValues[2].toString();
+  const parcelShippedEvent = async (sender, receiver, parcelId) => {
+    console.log(`Parcel ${parcelId} shipped from ${sender} to ${receiver}`);
+    if (sender === walletAddress) {
+      const text = sender + " " + receiver + " " + parcelId;
+      const qr_url = await generateQRCode(text);
+      console.log("qr_url:- ", qr_url);
+      // TODO show the shipper parcel has shipped and this url
+      toast({
+        title: 'Parcel Shipped',
+        description: `Your parcel with ID ${parcelId} has been shipped to ${receiver}`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+    else if (receiver === walletAddress) {
+      // TODO show the receiver parcel has shipped and its id
+      toast({
+        title: 'Parcel Shipped',
+        description: `You have received a parcel with ID ${parcelId} from ${sender}`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
-        console.log(`Parcel ${parcelId} shipped from ${sender} to ${receiver}`);
-        if (sender === walletAddress) {
-          const text = sender + " " + receiver + " " + parcelId;
-          const qr_url = await generateQRCode(text);
-          console.log("qr_url:- ", qr_url);
-          // TODO show the shipper parcel has shipped and this url
-          toast({
-            title: 'Parcel Shipped',
-            description: `Your parcel with ID ${parcelId} has been shipped to ${receiver}`,
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          });
-        }
-        else if (receiver === walletAddress) {
-          // TODO show the receiver parcel has shipped and its id
-          toast({
-            title: 'Parcel Shipped',
-            description: `You have received a parcel with ID ${parcelId} from ${sender}`,
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          });
-        }
-      }
+  const parcelLocationUpdatedEvent = (partner, receiver, parcelId) => {
+    console.log(`Parcel ${parcelId} updated by ${partner}`);
+    if (partner == walletAddress || receiver == walletAddress) toast({
+      title: 'Parcel Location Updated',
+      description: `Parcel with ID ${parcelId} has been updated by ${partner}`,
+      status: 'info',
+      duration: 5000,
+      isClosable: true,
     });
+  };
 
-  }
-
-  const parcelLocationUpdatedListener = async () => {
-    camoParcelInstance.once('ParcelLocationUpdated', async (error, event) => {
-      if (error) {
-        console.error(error);
-      } else {
-        const partner = event.returnValues[0];
-        const receiver = event.returnValues[1];
-        const parcelId = event.returnValues[2].toString();
-        // TODO show user this event 
-        if (partner == walletAddress || receiver == walletAddress) toast({
-          title: 'Parcel Location Updated',
-          description: `Parcel with ID ${parcelId} has been updated by ${partner}`,
-          status: 'info',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
+  const ParcelDeliveredEvent = (partner, receiver, parcelId) => {
+    if (partner === walletAddress || receiver === walletAddress) toast({
+      title: 'Parcel Delivered',
+      description: `Parcel with ID ${parcelId} has been delivered by ${partner}`,
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
     });
-  }
-
-
-  const parcelDeliveredListener = async () => {
-    camoParcelInstance.once('ParcelDeliveredEvent', async (error, event) => {
-      if (error) {
-        console.error(error);
-      } else {
-        const partner = event.returnValues[0];
-        const receiver = event.returnValues[1];
-        const parcelId = event.returnValues[2].toString();
-
-
-        // TODO show user this event
-        if (partner === walletAddress || receiver === walletAddress) toast({
-          title: 'Parcel Delivered',
-          description: `Parcel with ID ${parcelId} has been delivered by ${partner}`,
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        });
-      }
-    });
-  }
+  };
 
   const connectWallet = async () => {
     console.log("connectWallet() called")
@@ -194,11 +156,120 @@ function App() {
       const camoParcelInstance = new web3Instance.eth.Contract(camoParcelAbi, addrParcel);
 
       console.log("camoParcelInstance:- ", camoParcelInstance);
+
+
       setCamoParcelInstance(camoParcelInstance);
     } catch (error) {
       console.error(error)
     }
   }
+
+  const rpcEndpoint = 'https://erpc.apothem.network';
+
+  async function sendRpcRequest(method, params) {
+    const response = await fetch(rpcEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method,
+        params
+      })
+    });
+    const json = await response.json();
+    if (json.error) {
+      throw new Error(json.error.message);
+    }
+    return json.result;
+  }
+  function processEvent(event) {
+    const eventId = `${event.blockHash}-${event.transactionHash}-${event.logIndex}`;
+    if (processedEvents.includes(eventId)) {
+      return;
+    }
+    processedEvents.push(eventId);
+
+    console.log(`New event: ${JSON.stringify(event)}`);
+    const eventTopic = event.topics[0];
+    let name_temp = "ParcelShippedEvent";
+
+    if (eventTopic == eventTopicLU) {
+      name_temp = "ParcelLocationUpdated";
+    } else if (eventTopic == eventTopicPD) {
+      name_temp = "ParcelDelivered";
+    } else if (eventTopic != eventTopicPS) {
+      return;
+    }
+    const eventAbi = {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "arg1",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "arg2",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "arg3",
+          "type": "uint256"
+        }
+      ],
+      "name": name_temp,
+      "type": "event"
+    };
+
+    // Decode the data
+    const decodedData = (new Web3()).eth.abi.decodeLog(eventAbi.inputs, event.data, event.topics.slice(1));
+
+    // Access the decoded data
+    const event_updater = decodedData.arg1;
+    const receiver = decodedData.arg2;
+    const parcelId = decodedData.arg3;
+    console.log("event_updater:- ", event_updater);
+    console.log("receiver:- ", receiver);
+    console.log("parcelId:- ", parcelId);
+
+    if (eventTopic == eventTopicLU) {
+      parcelLocationUpdatedEvent(event_updater, receiver, parcelId);
+    } else if (eventTopic == eventTopicPD) {
+      ParcelDeliveredEvent(event_updater, receiver, parcelId);
+    } else if (eventTopic == eventTopicPS) {
+      parcelShippedEvent(event_updater, receiver, parcelId);
+    }
+  }
+  async function listenToEvents(contractAddress, eventTopic, fromBlock) {
+    // Create a new event filter
+    const filterId = await sendRpcRequest('eth_newFilter', [{
+      address: contractAddress,
+      topics: [eventTopic],
+      fromBlock
+    }]);
+
+    // Poll for new events every 5 seconds
+    setInterval(async () => {
+      const events = await sendRpcRequest('eth_getFilterChanges', [filterId]);
+      events.forEach(event => {
+        processEvent(event)
+      });
+    }, 5000);
+  }
+
+  const contractAddress = addrParcel;
+  const eventTopicPS = "0x32c1836ded10d94133bd527768a93f4a18336e79a66c70baa8093401c9e3440f";
+  const eventTopicLU = "0xa3c313d9290f28b0a583dcc5ceabc0a50c3124d1ae9ae1630668c1f404d5a6b6";
+  const eventTopicPD = "0x3be6b44b0d8170026cc992b6b6eda259b98e02d16bdfe4b9dd3db223b5420cfd"
+  const fromBlock = '0x0'; // Start listening from the first block
+  listenToEvents(contractAddress, eventTopicLU, fromBlock);
+  listenToEvents(contractAddress, eventTopicPD, fromBlock);
+  listenToEvents(contractAddress, eventTopicPS, fromBlock);
 
   // this function reloads the wepage whenever the connected account changes
   const listenMMAccount = async () => {
