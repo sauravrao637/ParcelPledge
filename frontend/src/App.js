@@ -58,7 +58,7 @@ function App() {
 
   const parcelShippedEvent = async (sender, receiver, parcelId) => {
     console.log(`Parcel ${parcelId} shipped from ${sender} to ${receiver}`);
-    if (sender === walletAddress) {
+    if (sender.toLowerCase() === walletAddress.toLowerCase()) {
       const text = sender + " " + receiver + " " + parcelId;
       const qr_url = await generateQRCode(text);
       console.log("qr_url:- ", qr_url);
@@ -71,7 +71,7 @@ function App() {
         isClosable: true,
       });
     }
-    else if (receiver === walletAddress) {
+    else if (receiver.toLowerCase() === walletAddress.toLowerCase()) {
       // TODO show the receiver parcel has shipped and its id
       toast({
         title: 'Parcel Shipped',
@@ -85,7 +85,7 @@ function App() {
 
   const parcelLocationUpdatedEvent = (partner, receiver, parcelId) => {
     console.log(`Parcel ${parcelId} updated by ${partner}`);
-    if (partner == walletAddress || receiver == walletAddress) toast({
+    if (partner.toLowerCase() == walletAddress.toLowerCase() || receiver.toLowerCase() == walletAddress.toLowerCase()) toast({
       title: 'Parcel Location Updated',
       description: `Parcel with ID ${parcelId} has been updated by ${partner}`,
       status: 'info',
@@ -95,7 +95,7 @@ function App() {
   };
 
   const ParcelDeliveredEvent = (partner, receiver, parcelId) => {
-    if (partner === walletAddress || receiver === walletAddress) toast({
+    if (partner.toLowerCase() === walletAddress.toLowerCase() || receiver.toLowerCase() === walletAddress.toLowerCase()) toast({
       title: 'Parcel Delivered',
       description: `Parcel with ID ${parcelId} has been delivered by ${partner}`,
       status: 'success',
