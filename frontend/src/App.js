@@ -9,6 +9,7 @@ import List from './List';
 import Owner from './Owner';
 import Navbar from "./components/NavBar";
 import { useToast } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
 
 
 // WEB3 Imports
@@ -421,6 +422,7 @@ function App() {
 
   return (
 
+    <ChakraProvider>
     <div className="App">
       <Router>
         <Navbar connectedAddress={walletAddress} myType={myType} />
@@ -437,6 +439,7 @@ function App() {
         </Routes>
       </Router>
     </div>
+    </ChakraProvider>
   );
 }
 

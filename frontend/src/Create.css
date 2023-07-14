@@ -23,7 +23,7 @@ body {
   .content-wrapper {
     display: flex;
     flex-direction: column;
-    width: 800px; 
+    width: 900px; 
     background-color: #7CE0F9;
     border-radius: 18px;
     padding: 40px; 
