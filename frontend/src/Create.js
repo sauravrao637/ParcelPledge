@@ -18,7 +18,7 @@ const Create = ({ connectedAddress, myType, shipOrder, getParcel }) => {
     console.log("expectedDelivery:", expectedDelivery);
     console.log("baseCompensation:", baseCompensation);
 
-    const targetDate = '2023-07-14';
+    const targetDate = expectedDelivery;
 
     // Create a new Date object for the current time
     const date = new Date();
@@ -65,13 +65,13 @@ const Create = ({ connectedAddress, myType, shipOrder, getParcel }) => {
                 <h2>Create New Freight Request</h2>
                 <form className="section" onSubmit={(event) => event.preventDefault()}>
                   <div className="form-field">
-                    <label htmlFor="itemName" onChange={(event) => setItemName(event.target.value)}>Item Name</label>
+                    <label htmlFor="itemName" >Item Name</label>
                     <input
                       type="text"
                       id="itemName"
                       className="name-input"
                       placeholder="Item Name"
-                      onChange={(event) => setItemDesc(event.target.value)}
+                      onChange={(event) => setItemName(event.target.value)}
                     />
                   </div>
                   <div className="form-field">

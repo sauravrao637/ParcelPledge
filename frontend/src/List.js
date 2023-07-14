@@ -7,36 +7,7 @@ const List = ({ connectedAddress, myType, myParcels }) => {
     else if (status_ === "1") return "In Transit";
     else if (status_ === "2") return "Delivered";
     return "Failed";
-  }
-  // const parcels = [
-  //   {
-  //     id: '1',
-  //     name: 'Parcel 1',
-  //     description: 'Sample description for Parcel 1',
-  //     currentLocation: 'Location A',
-  //     status: 'In Transit',
-  //     expectedDeliveryDate: '2023-07-12',
-  //     otp: '123456',
-  //   },
-  //   {
-  //     id: '2',
-  //     name: 'Parcel 2',
-  //     description: 'Sample description for Parcel 2',
-  //     currentLocation: 'Location B',
-  //     status: 'Delivered',
-  //     expectedDeliveryDate: '2023-07-10',
-  //     otp: '654321',
-  //   },
-  //   {
-  //     id: '3',
-  //     name: 'Parcel 3',
-  //     description: 'Sample description for Parcel 3',
-  //     currentLocation: 'Location C',
-  //     status: 'In Transit',
-  //     expectedDeliveryDate: '2023-07-15',
-  //     otp: '987654',
-  //   },
-  // ];
+  };
   const parcels = myParcels;
 
   return (

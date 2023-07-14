@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import './Scan.css';
-
+import Html5QrcodePlugin from './Html5QrcodePlugin.jsx';
 const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation }) => {
   const [parcelId, setParcelId] = useState('');
   const [otpValue, setOtpValue] = useState('');
@@ -20,63 +20,33 @@ const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation })
   const markDelivered = () => {
     markParcelDelivered(parcelId, otpValue);
   }
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
 
-  const handleScanParcel = () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true })
-        .then((stream) => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch((error) => {
-          console.error('Error accessing camera:', error);
-        });
-    }
-  };
-
-  const handleCapturePicture = () => {
-    if (videoRef.current && canvasRef.current) {
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const context = canvas.getContext('2d');
-      video.play();
-
-      video.onloadedmetadata = () => {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = canvas.toDataURL('image/png');
-        console.log('Captured Image:', imageData);
-      };
-    }
+  const onNewScanResult = (decodedText, decodedResult) => {
+    console.log("App [result]", decodedResult);
+    const info = decodedText.split(' ');
+    // const element = document.getElementById('parcelId');
+    // element.textContent = info[2];
+    setParcelId(info[2]);
+    // setDecodedResults(prev => [...prev, decodedResult]);
   };
 
   return (
     <div className="parcel-container">
-      <div className="scan-parcel-box" onClick={handleScanParcel}>
-        <h2>Scan Parcel</h2>
-      </div>
+      <Html5QrcodePlugin
+        fps={10}
+        qrbox={250}
+        disableFlip={false}
+        qrCodeSuccessCallback={onNewScanResult} />
+
       <div className="parcel-id-box">
         <input
           type="text"
           id="parcelId"
+          value={parcelId}
           className="name-input"
           placeholder="ParcelId"
           onChange={(event) => setParcelId(event.target.value)}
         />
-      </div>
-      <div className="action-buttons">
-        <button onClick={handleCapturePicture}>Capture Picture</button>
-      </div>
-      <div className="camera-container">
-        <video className="camera" ref={videoRef} autoPlay playsInline />
-      </div>
-      <div className="canvas-container">
-        <canvas className="canvas" ref={canvasRef} />
       </div>
       <div className="action-buttons">
         <button onClick={updateLoc}>Update Location</button>

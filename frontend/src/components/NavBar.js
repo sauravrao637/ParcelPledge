@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { ChakraProvider, Box, Flex, Button } from "@chakra-ui/react";
 import { FaWallet } from "react-icons/fa";
 import { Link } from 'react-router-dom';
-
-const Navbar = ({ connectedAddress }) => {
+import { TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER, DEFAULT_USER_TYPE } from "../utils";
+const Navbar = ({ myType, connectedAddress }) => {
 
 
   return (
@@ -25,7 +25,20 @@ const Navbar = ({ connectedAddress }) => {
     >
       <Box>
         <Box as="span" fontSize="xl" fontWeight="bold">
-          XDC
+          XDC ParcelPledge
+        </Box>
+
+      </Box>
+
+
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="flex-end"
+        flexBasis={{ base: "100%", md: "auto" }}>
+        <FaWallet size={24} />
+        <Box fontSize="xl" fontWeight="bold" ml={4} cursor="default">
+          {(connectedAddress ? connectedAddress.slice(0, 6) + '...' + connectedAddress.slice(-4) : 'Connect Wallet')}
         </Box>
       </Box>
 
@@ -50,61 +63,80 @@ const Navbar = ({ connectedAddress }) => {
           </Button>
         </Link>
 
-        <Link to="/shipper">
-          <Button
-            as="a"
-            href="/"
-            colorScheme="purple"
-            size="lg"
-            fontWeight="bold"
-            px={8}
-            py={4}
-            ml={4}
-          >
-            Create Parcel
-          </Button>
-        </Link>
+        {
+          (myType === DEFAULT_USER_TYPE || myType === TYPE_SHIPPER) &&
+          <Link to="/shipper">
+            <Button
+              as="a"
+              href="/"
+              colorScheme="purple"
+              size="lg"
+              fontWeight="bold"
+              px={8}
+              py={4}
+              ml={4}
+            >
+              Shipper
+            </Button>
+          </Link>
+        }
+        {
+          (myType === DEFAULT_USER_TYPE || myType === TYPE_PARTNER) &&
+          < Link to="/partner">
+            <Button
+              as="a"
+              href="/"
+              colorScheme="teal"
+              size="lg"
+              fontWeight="bold"
+              px={8}
+              py={4}
+              ml={4}
+              alignSelf="flex-end"
+            >
+              Partner
+            </Button>
+          </Link>
+        }
+        {
+          myType === DEFAULT_USER_TYPE &&
+          <Link to="/myparcels">
+            <Button
+              as="a"
+              href="/"
+              colorScheme="teal"
+              size="lg"
+              fontWeight="bold"
+              px={8}
+              py={4}
+              ml={4}
+              alignSelf="flex-end"
+            >
+              MyParcels
+            </Button>
+          </Link>
+        }
+        {
+          myType === TYPE_OWNER &&
 
-        <Link to="/partner">
-          <Button
-            as="a"
-            href="/"
-            colorScheme="teal"
-            size="lg"
-            fontWeight="bold"
-            px={8}
-            py={4}
-            ml={4}
-            alignSelf="flex-end"
-          >
-            Scan
-          </Button>
-        </Link>
-
-        <Link to="/myparcels">
-          <Button
-            as="a"
-            href="/"
-            colorScheme="teal"
-            size="lg"
-            fontWeight="bold"
-            px={8}
-            py={4}
-            ml={4}
-            alignSelf="flex-end"
-          >
-            List
-          </Button>
-        </Link>
-
-        <Box fontSize="xl" fontWeight="bold" ml={4} cursor="default">
-          {connectedAddress ? connectedAddress.slice(0, 6) + '...' + connectedAddress.slice(-4) : ''}
-        </Box>
-
-        <FaWallet size={24} />
-
+          <Link to="/owner">
+            <Button
+              as="a"
+              href="/"
+              colorScheme="teal"
+              size="lg"
+              fontWeight="bold"
+              px={8}
+              py={4}
+              ml={4}
+              alignSelf="flex-end"
+            >
+              Contract
+            </Button>
+          </Link>
+        }
       </Box>
-    </Flex>
+    </Flex >
   );
 }
 
