@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Create from './Create';
 import Scan from './Scan';
 import List from './List';
+import Owner from './Owner';
 import Navbar from "./components/NavBar";
 import { useToast } from '@chakra-ui/react';
 
@@ -55,6 +56,7 @@ function App() {
     }
     parcelShippedListener();
     parcelLocationUpdatedListener();
+    parcelDeliveredListener();
   }, [camoParcelInstance, walletAddress])
 
 
@@ -63,6 +65,7 @@ function App() {
       if (error) {
         console.error(error);
       } else {
+        console.log("event: ", event);
         const sender = event.returnValues[0];
         const receiver = event.returnValues[1];
         const parcelId = event.returnValues[2].toString();
@@ -105,7 +108,7 @@ function App() {
         const receiver = event.returnValues[1];
         const parcelId = event.returnValues[2].toString();
         // TODO show user this event 
-        toast({
+        if (partner == walletAddress || receiver == walletAddress) toast({
           title: 'Parcel Location Updated',
           description: `Parcel with ID ${parcelId} has been updated by ${partner}`,
           status: 'info',
@@ -128,7 +131,7 @@ function App() {
 
 
         // TODO show user this event
-        toast({
+        if (partner === walletAddress || receiver === walletAddress) toast({
           title: 'Parcel Delivered',
           description: `Parcel with ID ${parcelId} has been delivered by ${partner}`,
           status: 'success',
@@ -349,7 +352,7 @@ function App() {
 
     <div className="App">
       <Router>
-        <Navbar connectedAddress={walletAddress} />
+        <Navbar connectedAddress={walletAddress} myType={myType} />
         <Routes>
           <Route path="/" element={<Home connectedAddress={walletAddress} />} />
 
@@ -358,6 +361,8 @@ function App() {
           <Route path="/partner" element={<Scan connectedAddress={walletAddress} myType={myType} markParcelDelivered={markParcelDelivered} updateLocation={updateLocation} />} />
 
           <Route path="/myparcels" element={<List connectedAddress={walletAddress} myType={myType} myParcels={myParcels} />} />
+
+          <Route path="/owner" element={<Owner connectedAddress={walletAddress} addPartner={addPartner} addShipper={addShipper} removeAssociate={removeAssociate} fundContract={fundContract} withdrawFunds={withdrawFunds} />} />
         </Routes>
       </Router>
     </div>
