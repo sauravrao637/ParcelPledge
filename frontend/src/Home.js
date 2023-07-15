@@ -5,10 +5,10 @@ import Hero from "./components/Hero";
 import Footer from "./components/Footer";
 
 
-const Home = ({ contract_url, connectedAddress }) => {
+const Home = () => {
   return (
     <>
-      <Hero contract_url={contract_url} />
+      <Hero />
     </>
   );
 };
