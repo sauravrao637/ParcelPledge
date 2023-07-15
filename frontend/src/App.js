@@ -3,13 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import Home from './Home';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Create from './Create';
 import Scan from './Scan';
 import List from './List';
 import Owner from './Owner';
 import Navbar from "./components/NavBar";
 import { useToast } from '@chakra-ui/react';
-import { ChakraProvider } from '@chakra-ui/react';
+import { ChakraProvider, Box } from '@chakra-ui/react';
 
 
 // WEB3 Imports
@@ -63,15 +64,20 @@ function App() {
       const text = sender + " " + receiver + " " + parcelId;
       const qr_url = await generateQRCode(text);
       console.log("qr_url:- ", qr_url);
-      // TODO show the shipper parcel has shipped and this url
-      toast({
-        title: 'Parcel Shipped',
-        description: `Your parcel with ID ${parcelId} has been shipped to ${receiver}`,
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-      });
+  
+      alert(`Your parcel with ID ${parcelId} has been shipped to ${receiver}. Click OK to view the QR Code.`);
+      // window.open(qr_url, '_blank');
+      const qrPageUrl = window.open("", "_blank");
+      qrPageUrl.document.write(`
+        <html>
+          <body>
+            <img src="${qr_url}" alt="QR Code">
+          </body>
+        </html>
+      `);
+      qrPageUrl.document.close();
     }
+  
     else if (receiver.toLowerCase() === walletAddress.toLowerCase()) {
       // TODO show the receiver parcel has shipped and its id
       toast({
