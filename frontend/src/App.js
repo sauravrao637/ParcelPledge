@@ -10,7 +10,7 @@ import Owner from './Owner';
 import Navbar from "./components/NavBar";
 import { useToast } from '@chakra-ui/react';
 import { ChakraProvider } from '@chakra-ui/react';
-
+import Footer from './components/Footer.js';
 
 // WEB3 Imports
 import Web3 from 'web3';
@@ -22,7 +22,7 @@ const eventTopicLU = "0xa3c313d9290f28b0a583dcc5ceabc0a50c3124d1ae9ae1630668c1f4
 const eventTopicPD = "0x3be6b44b0d8170026cc992b6b6eda259b98e02d16bdfe4b9dd3db223b5420cfd"
 const fromBlock = '0x0'; // Start listening from the first block
 const rpcEndpoint = 'https://erpc.apothem.network';
-
+const contract_url = "https://explorer.apothem.network/address/xdc" + addrParcel.slice(2);
 
 function App() {
 
@@ -443,7 +443,7 @@ function App() {
         <Router>
           <Navbar connectedAddress={walletAddress} myType={myType} />
           <Routes>
-            <Route path="/" element={<Home connectedAddress={walletAddress} />} />
+            <Route path="/" element={<Home />} />
 
             <Route path="/shipper" element={<Create connectedAddress={walletAddress} myType={myType} shipOrder={shipOrder} />} getParcel={getParcel} />
 
@@ -454,6 +454,7 @@ function App() {
             <Route path="/owner" element={<Owner connectedAddress={walletAddress} addPartner={addPartner} addShipper={addShipper} removeAssociate={removeAssociate} fundContract={fundContract} withdrawFunds={withdrawFunds} />} />
           </Routes>
         </Router>
+        <Footer contract_url={contract_url} address={walletAddress} />
       </div>
     </ChakraProvider>
   );

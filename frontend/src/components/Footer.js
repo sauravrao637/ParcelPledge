@@ -1,30 +1,16 @@
 import React from "react";
-import backgroundImg from './dark.jpg';
 import "./Footer.css";
 
-function Footer() {
+function Footer({ contract_url, address }) {
+  console.log(address);
+  const shipper_link = "mailto:sauravrao637@gmail.com?subject=RegisterShipper&body=" + address;
+  const partner_link = "mailto:sauravrao637@gmail.com?subject=RegisterPartner&body=" + address;
   return (
     <>
       <div className="footer-container" style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
         <div className="footer-content">
-          <div className="logo-container">
-            <h4 className="logo">
-              Web3Berlin<span className="logo-highlight">Hackathon</span>
-            </h4>
-          </div>
-          <div className="subscribe-form">
-            <p className="subtitle">
-              Join us and never miss out on our Latest Updates.
-            </p>
-            <form action="">
-              <input
-                type="text"
-                className="email-input"
-                placeholder="Enter your email"
-              />
-              <button className="subscribe-button">Subscribe</button>
-            </form>
-          </div>
+          <div>Register as <a href={shipper_link}><span className="logo-highlight">Shipper</span></a> / <a href={partner_link}><span className="logo-highlight">Partner</span></a> </div>
+          <div><a href={contract_url}>View Contract on Apothem</a></div>
         </div>
       </div>
     </>

@@ -5,11 +5,8 @@ import { motion } from 'framer-motion';
 import backgroundImg from './dark.jpg';
 import heroImg from './parcel.jpg';
 import { Link } from 'react-router-dom';
-
-const Hero = ({ contract_url }) => {
-
-  // TODO add view contract on explorer
-
+import Footer from './Footer.js';
+const Hero = () => {
   return (
     <>
       <Box
@@ -92,36 +89,6 @@ const Hero = ({ contract_url }) => {
             </motion.div>
           </Box>
         </Flex>
-        <Box
-          className="footer-container"
-          position="absolute"
-          bottom={0}
-          left={0}
-          width="100%"
-          py={4}
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-        >
-          <Box className="footer-content">
-            <Box className="logo-container">
-              <Heading as="h4" className="logo" size="md">
-                Web3Berlin<span className="logo-highlight">Hackathon</span>
-              </Heading>
-            </Box>
-            <Box className="subscribe-form">
-              <Text className="subtitle">
-                Join us and never miss out on our Latest Updates.
-              </Text>
-              <form action="">
-                <input
-                  type="text"
-                  className="email-input"
-                  placeholder="Enter your email"
-                />
-                <button className="subscribe-button">Subscribe</button>
-              </form>
-            </Box>
-          </Box>
-        </Box>
       </Box>
     </>
   );
