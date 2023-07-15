@@ -13,7 +13,7 @@ const Hero = () => {
         bgImage={`url(${backgroundImg})`}
         bgSize="cover"
         bgPosition="center"
-        height="100vh"
+        height="93vh"
         position="relative"
       >
         <Flex
@@ -34,7 +34,7 @@ const Hero = () => {
               />
             </Heading>
             <Text fontSize="2xl" mb={8} fontFamily="Arial">
-              Our platform combines smart contracts, IoT, and AI to revolutionize logistics. With the added feature of image hosting on the IPFS, our platform for efficient and secure parcel tracking.</Text>
+              Our platform combines smart contracts, to revolutionize logistics and provides Effortless Shipment Tracking & Instant Insurance Claim Payouts.</Text>
             <Link to="/shipper">
               <Button
                 colorScheme="teal"

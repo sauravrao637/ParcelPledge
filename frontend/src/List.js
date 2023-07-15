@@ -11,7 +11,7 @@ const List = ({ connectedAddress, myType, myParcels }) => {
   const parcels = myParcels;
 
   return (
-    <div className="parcel-container">
+    <div className="parcel-containerr">
       {parcels.map((parcel) => (
         <div className="parcel-box" key={parcel.id.toString()}>
           <h2>ID: {parcel.id.toString()}</h2>

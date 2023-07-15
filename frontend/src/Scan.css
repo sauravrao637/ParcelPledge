@@ -1,9 +1,10 @@
-.parcel-container {
+.parcel-containers {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 93vh;
+    
   }
   
   .scan-parcel-box {
@@ -29,6 +30,7 @@
     background-color: #f2f2f2;
     border: 1px solid #dddddd;
     border-radius: 8px;
+    margin-bottom: 50px;
   }
   
   .parcel-id-box h3 {

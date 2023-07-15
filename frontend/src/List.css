@@ -1,27 +1,28 @@
-.parcel-container {
-<<<<<<< HEAD
+.parcel-containerr {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 50px;
   padding: 250px;
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.5);
+
 }
-  
-  .parcel-box {
-    width: 350px;
-    height: 300px;
-    padding: 20px;
-    background-color: #f2f2f2;
-    border: 2px solid #dddddd;
-    border-radius: 8px;
-    flex-direction: column;
-  }
-  
-  .parcel-box h2 {
-    font-size: 20px;
-    margin-bottom: 10px;
-  }
-  
-  .parcel-box p {
-    margin: 8px 0;
-  }
-  
+
+.parcel-box {
+  width: 350px;
+  height: 300px;
+  padding: 20px;
+  background-color: #f2f2f2;
+  border: 2px solid #dddddd;
+  border-radius: 8px;
+  flex-direction: column;
+}
+
+.parcel-box h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.parcel-box p {
+  margin: 8px 0;
+}

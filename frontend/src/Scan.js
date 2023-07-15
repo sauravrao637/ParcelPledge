@@ -31,7 +31,7 @@ const Scan = ({ connectedAddress, myType, markParcelDelivered, updateLocation })
   };
 
   return (
-    <div className="parcel-container">
+    <div className="parcel-containers">
       <Html5QrcodePlugin
         fps={10}
         qrbox={250}
