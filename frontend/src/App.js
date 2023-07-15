@@ -14,11 +14,15 @@ import { ChakraProvider } from '@chakra-ui/react';
 
 // WEB3 Imports
 import Web3 from 'web3';
-import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER, DEBUG, TESTING_USER_TYPE, generateQRCode } from './utils';
+import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, DEBUG, TESTING_USER_TYPE, generateQRCode } from './utils';
 
-const BigNumber = require('bignumber.js');
-const bnZero = new BigNumber(0);
 const processedEvents = [];
+const eventTopicPS = "0x32c1836ded10d94133bd527768a93f4a18336e79a66c70baa8093401c9e3440f";
+const eventTopicLU = "0xa3c313d9290f28b0a583dcc5ceabc0a50c3124d1ae9ae1630668c1f404d5a6b6";
+const eventTopicPD = "0x3be6b44b0d8170026cc992b6b6eda259b98e02d16bdfe4b9dd3db223b5420cfd"
+const fromBlock = '0x0'; // Start listening from the first block
+const rpcEndpoint = 'https://erpc.apothem.network';
+
 
 function App() {
 
@@ -31,6 +35,32 @@ function App() {
   const [myType, setMyType] = useState(DEFAULT_USER_TYPE);
   const [myParcels, setMyParcels] = useState([]);
   const toast = useToast();
+
+
+  const [stopEventListeners, setStopEventListeners] = useState([]);
+
+  const listenToEvents = async (walletAddress, contractAddress, eventTopic, fromBlock) => {
+    // Create a new event filter
+    const filterId = await sendRpcRequest('eth_newFilter', [{
+      address: contractAddress,
+      topics: [eventTopic],
+      fromBlock
+    }]);
+
+    // Poll for new events every 5 seconds
+    async function pollEvents() {
+      const events = await sendRpcRequest('eth_getFilterChanges', [filterId]);
+      events.forEach(event => {
+        processEvent(walletAddress, event)
+      });
+    }
+
+    const intervalId = setInterval(async () => {
+      await pollEvents();
+    }, 5000);
+
+    setStopEventListeners(prevStopEventListeners => [...prevStopEventListeners, intervalId]);
+  }
 
   useEffect(() => {
     connectWallet();
@@ -56,14 +86,18 @@ function App() {
     }
   }, [camoParcelInstance, walletAddress])
 
+  const setupEventListeners = (walletAddress) => {
+    listenToEvents(walletAddress, addrParcel, eventTopicLU, fromBlock);
+    listenToEvents(walletAddress, addrParcel, eventTopicPS, fromBlock);
+    listenToEvents(walletAddress, addrParcel, eventTopicPD, fromBlock);
+  }
 
-  const parcelShippedEvent = async (sender, receiver, parcelId) => {
+  const parcelShippedEvent = async (walletAddress, sender, receiver, parcelId) => {
     console.log(`Parcel ${parcelId} shipped from ${sender} to ${receiver}`);
-    if (sender.toLowerCase() === walletAddress.toLowerCase()) {
+    if (sender === walletAddress) {
       const text = sender + " " + receiver + " " + parcelId;
       const qr_url = await generateQRCode(text);
       console.log("qr_url:- ", qr_url);
-      // TODO show the shipper parcel has shipped and this url
       toast({
         title: 'Parcel Shipped',
         description: `Your parcel with ID ${parcelId} has been shipped to ${receiver}`,
@@ -72,8 +106,7 @@ function App() {
         isClosable: true,
       });
     }
-    else if (receiver.toLowerCase() === walletAddress.toLowerCase()) {
-      // TODO show the receiver parcel has shipped and its id
+    else if (receiver === walletAddress) {
       toast({
         title: 'Parcel Shipped',
         description: `You have received a parcel with ID ${parcelId} from ${sender}`,
@@ -84,19 +117,27 @@ function App() {
     }
   };
 
-  const parcelLocationUpdatedEvent = (partner, receiver, parcelId) => {
-    console.log(`Parcel ${parcelId} updated by ${partner}`);
-    if (partner.toLowerCase() == walletAddress.toLowerCase() || receiver.toLowerCase() == walletAddress.toLowerCase()) toast({
+  const parcelLocationUpdatedEvent = (walletAddress, partner, receiver, parcelId) => {
+
+    console.log(`Parcel ${parcelId} updated by ${partner}, `, walletAddress);
+    if (partner === walletAddress) toast({
       title: 'Parcel Location Updated',
-      description: `Parcel with ID ${parcelId} has been updated by ${partner}`,
+      description: `Location for parcel with ID ${parcelId} has been updated by successfully`,
+      status: 'info',
+      duration: 5000,
+      isClosable: true,
+    });
+    else if (receiver === walletAddress) toast({
+      title: 'Parcel Location Updated',
+      description: `Location for your parcel with ID ${parcelId} has been updated by ${partner}`,
       status: 'info',
       duration: 5000,
       isClosable: true,
     });
   };
 
-  const ParcelDeliveredEvent = (partner, receiver, parcelId) => {
-    if (partner.toLowerCase() === walletAddress.toLowerCase() || receiver.toLowerCase() === walletAddress.toLowerCase()) toast({
+  const ParcelDeliveredEvent = (walletAddress, partner, receiver, parcelId) => {
+    if (partner === walletAddress || receiver === walletAddress) toast({
       title: 'Parcel Delivered',
       description: `Parcel with ID ${parcelId} has been delivered by ${partner}`,
       status: 'success',
@@ -121,7 +162,6 @@ function App() {
         // Get the selected account
         const accounts = await web3.eth.getAccounts();
         const address = accounts[0];
-
         setWalletAddress(address);
         setWeb3(web3);
       } else {
@@ -139,6 +179,8 @@ function App() {
     console.log("web3:- ", web3);
     try {
       loadParcelContract();
+      stopEventListeners.forEach(stopPolling => clearInterval(stopPolling));
+      setupEventListeners(walletAddress);
     } catch (error) {
       console.error(error);
     }
@@ -165,7 +207,6 @@ function App() {
     }
   }
 
-  const rpcEndpoint = 'https://erpc.apothem.network';
 
   async function sendRpcRequest(method, params) {
     const response = await fetch(rpcEndpoint, {
@@ -186,7 +227,7 @@ function App() {
     }
     return json.result;
   }
-  function processEvent(event) {
+  function processEvent(walletAddress, event) {
     const eventId = `${event.blockHash}-${event.transactionHash}-${event.logIndex}`;
     if (processedEvents.includes(eventId)) {
       return;
@@ -197,11 +238,11 @@ function App() {
     const eventTopic = event.topics[0];
     let name_temp = "ParcelShippedEvent";
 
-    if (eventTopic == eventTopicLU) {
+    if (eventTopic === eventTopicLU) {
       name_temp = "ParcelLocationUpdated";
-    } else if (eventTopic == eventTopicPD) {
+    } else if (eventTopic === eventTopicPD) {
       name_temp = "ParcelDelivered";
-    } else if (eventTopic != eventTopicPS) {
+    } else if (eventTopic !== eventTopicPS) {
       return;
     }
     const eventAbi = {
@@ -238,44 +279,17 @@ function App() {
     console.log("receiver:- ", receiver);
     console.log("parcelId:- ", parcelId);
 
-    if (eventTopic == eventTopicLU) {
-      parcelLocationUpdatedEvent(event_updater, receiver, parcelId);
-    } else if (eventTopic == eventTopicPD) {
-      ParcelDeliveredEvent(event_updater, receiver, parcelId);
-    } else if (eventTopic == eventTopicPS) {
-      parcelShippedEvent(event_updater, receiver, parcelId);
+    if (eventTopic === eventTopicLU) {
+      parcelLocationUpdatedEvent(walletAddress, event_updater, receiver, parcelId);
+    } else if (eventTopic === eventTopicPD) {
+      ParcelDeliveredEvent(walletAddress, event_updater, receiver, parcelId);
+    } else if (eventTopic === eventTopicPS) {
+      parcelShippedEvent(walletAddress, event_updater, receiver, parcelId);
     }
   }
-  async function listenToEvents(contractAddress, eventTopic, fromBlock) {
-    // Create a new event filter
-    const filterId = await sendRpcRequest('eth_newFilter', [{
-      address: contractAddress,
-      topics: [eventTopic],
-      fromBlock
-    }]);
-
-    // Poll for new events every 5 seconds
-    setInterval(async () => {
-      const events = await sendRpcRequest('eth_getFilterChanges', [filterId]);
-      events.forEach(event => {
-        processEvent(event)
-      });
-    }, 5000);
-  }
-
-  const contractAddress = addrParcel;
-  const eventTopicPS = "0x32c1836ded10d94133bd527768a93f4a18336e79a66c70baa8093401c9e3440f";
-  const eventTopicLU = "0xa3c313d9290f28b0a583dcc5ceabc0a50c3124d1ae9ae1630668c1f404d5a6b6";
-  const eventTopicPD = "0x3be6b44b0d8170026cc992b6b6eda259b98e02d16bdfe4b9dd3db223b5420cfd"
-  const fromBlock = '0x0'; // Start listening from the first block
-  listenToEvents(contractAddress, eventTopicLU, fromBlock);
-  listenToEvents(contractAddress, eventTopicPD, fromBlock);
-  listenToEvents(contractAddress, eventTopicPS, fromBlock);
-
   // this function reloads the wepage whenever the connected account changes
   const listenMMAccount = async () => {
     try {
-      const web3Instance = web3;
       window.ethereum.on("accountsChanged", async function () {
         window.location.reload();
       });
@@ -350,6 +364,7 @@ function App() {
     console.log("fundContract(_) called ,", amount);
     try {
       const result = await camoParcelInstance.methods.fund().send({ from: window.web3.currentProvider.selectedAddress, value: amount })
+      console.log(result);
     } catch (error) {
       console.error(error);
     }
@@ -380,6 +395,7 @@ function App() {
     console.log("markParcelDelivered(_,_) called ,", parcelId, otp);
     try {
       const result = await camoParcelInstance.methods.markParcelDelivered(parcelId, otp).send({ from: window.web3.currentProvider.selectedAddress })
+      console.log(result);
     } catch (error) {
       console.error(error);
     }
@@ -423,22 +439,22 @@ function App() {
   return (
 
     <ChakraProvider>
-    <div className="App">
-      <Router>
-        <Navbar connectedAddress={walletAddress} myType={myType} />
-        <Routes>
-          <Route path="/" element={<Home connectedAddress={walletAddress} />} />
+      <div className="App">
+        <Router>
+          <Navbar connectedAddress={walletAddress} myType={myType} />
+          <Routes>
+            <Route path="/" element={<Home connectedAddress={walletAddress} />} />
 
-          <Route path="/shipper" element={<Create connectedAddress={walletAddress} myType={myType} shipOrder={shipOrder} />} getParcel={getParcel} />
+            <Route path="/shipper" element={<Create connectedAddress={walletAddress} myType={myType} shipOrder={shipOrder} />} getParcel={getParcel} />
 
-          <Route path="/partner" element={<Scan connectedAddress={walletAddress} myType={myType} markParcelDelivered={markParcelDelivered} updateLocation={updateLocation} />} />
+            <Route path="/partner" element={<Scan connectedAddress={walletAddress} myType={myType} markParcelDelivered={markParcelDelivered} updateLocation={updateLocation} />} />
 
-          <Route path="/myparcels" element={<List connectedAddress={walletAddress} myType={myType} myParcels={myParcels} />} />
+            <Route path="/myparcels" element={<List connectedAddress={walletAddress} myType={myType} myParcels={myParcels} />} />
 
-          <Route path="/owner" element={<Owner connectedAddress={walletAddress} addPartner={addPartner} addShipper={addShipper} removeAssociate={removeAssociate} fundContract={fundContract} withdrawFunds={withdrawFunds} />} />
-        </Routes>
-      </Router>
-    </div>
+            <Route path="/owner" element={<Owner connectedAddress={walletAddress} addPartner={addPartner} addShipper={addShipper} removeAssociate={removeAssociate} fundContract={fundContract} withdrawFunds={withdrawFunds} />} />
+          </Routes>
+        </Router>
+      </div>
     </ChakraProvider>
   );
 }
