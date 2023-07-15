@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { ChakraProvider, Box, Flex, Button } from "@chakra-ui/react";
+import React from "react";
+import { Box, Flex, Button } from "@chakra-ui/react";
 import { FaWallet } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER, DEFAULT_USER_TYPE } from "../utils";
+
 const Navbar = ({ myType, connectedAddress }) => {
-
-
   return (
     <Flex
       as="nav"
@@ -13,41 +12,31 @@ const Navbar = ({ myType, connectedAddress }) => {
       justify="space-between"
       wrap="wrap"
       w="100%"
-      py={14}
-      px={18}
+      py={2} 
+      px={10} 
       color="white"
-      position="absolute"
+      position="fixed" 
       top={0}
       left={0}
-      backdropFilter="blur(10px)"
-      zIndex={1}
+      zIndex={100} 
       bg="rgba(0, 0, 0, 0.5)"
     >
       <Box>
         <Box as="span" fontSize="xl" fontWeight="bold">
           XDC ParcelPledge
         </Box>
-
       </Box>
 
-
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="flex-end"
-        flexBasis={{ base: "100%", md: "auto" }}>
+      <Box display="flex" alignItems="center" justifyContent="flex-end">
         <FaWallet size={24} />
         <Box fontSize="xl" fontWeight="bold" ml={4} cursor="default">
-          {(connectedAddress ? connectedAddress.slice(0, 6) + '...' + connectedAddress.slice(-4) : 'Connect Wallet')}
+          {connectedAddress
+            ? `${connectedAddress.slice(0, 6)}...${connectedAddress.slice(-4)}`
+            : "Connect Wallet"}
         </Box>
       </Box>
 
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="flex-end"
-        flexBasis={{ base: "100%", md: "auto" }}
-      >
+      <Box display="flex" alignItems="center" justifyContent="flex-end">
         <Link to="/">
           <Button
             as="a"
@@ -63,8 +52,7 @@ const Navbar = ({ myType, connectedAddress }) => {
           </Button>
         </Link>
 
-        {
-          (myType === DEFAULT_USER_TYPE || myType === TYPE_SHIPPER) &&
+        {(myType === DEFAULT_USER_TYPE || myType === TYPE_SHIPPER) && (
           <Link to="/shipper">
             <Button
               as="a"
@@ -79,10 +67,10 @@ const Navbar = ({ myType, connectedAddress }) => {
               Shipper
             </Button>
           </Link>
-        }
-        {
-          (myType === DEFAULT_USER_TYPE || myType === TYPE_PARTNER) &&
-          < Link to="/partner">
+        )}
+
+        {(myType === DEFAULT_USER_TYPE || myType === TYPE_PARTNER) && (
+          <Link to="/partner">
             <Button
               as="a"
               href="/"
@@ -97,9 +85,9 @@ const Navbar = ({ myType, connectedAddress }) => {
               Partner
             </Button>
           </Link>
-        }
-        {
-          myType === DEFAULT_USER_TYPE &&
+        )}
+
+        {myType === DEFAULT_USER_TYPE && (
           <Link to="/myparcels">
             <Button
               as="a"
@@ -115,10 +103,9 @@ const Navbar = ({ myType, connectedAddress }) => {
               MyParcels
             </Button>
           </Link>
-        }
-        {
-          myType === TYPE_OWNER &&
+        )}
 
+        {myType === TYPE_OWNER && (
           <Link to="/owner">
             <Button
               as="a"
@@ -134,10 +121,10 @@ const Navbar = ({ myType, connectedAddress }) => {
               Contract
             </Button>
           </Link>
-        }
+        )}
       </Box>
-    </Flex >
+    </Flex>
   );
-}
+};
 
 export default Navbar;

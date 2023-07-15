@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import "./Create.css";
 
 import { addrParcel, CHAIN_PARAMS, DEFAULT_USER_TYPE, TYPE_SHIPPER, TYPE_PARTNER, TYPE_OWNER } from './utils';
@@ -95,7 +94,7 @@ const Create = ({ connectedAddress, myType, shipOrder, getParcel }) => {
                   type="text"
                   id="compensationAmount"
                   className="name-input"
-                  placeholder="Compensatino Price in XDC"
+                  placeholder="Compensation Price in XDC"
                   onChange={(event) => setBaseConpensation(event.target.value.toString() + "000000000000000000")}
                 />
               </div>

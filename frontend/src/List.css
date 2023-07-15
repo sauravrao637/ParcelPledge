@@ -2,15 +2,15 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 50px;
-  padding: 250px;
+  padding: 150px;
   backdrop-filter: blur(10px);
   background-color: rgba(255, 255, 255, 0.5);
-
+  margin-top: 0px; 
 }
 
 .parcel-box {
-  width: 350px;
-  height: 300px;
+  width: 100%; 
+  height: auto; 
   padding: 20px;
   background-color: #f2f2f2;
   border: 2px solid #dddddd;

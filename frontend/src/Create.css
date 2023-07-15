@@ -3,21 +3,17 @@ body {
     padding: 0;
     font-family: Arial, sans-serif;
   }
-
-  .pages {
-    background-color: #111;
-    color: black;
-  }
   
   .details-page {
     display: flex;
     flex-direction: column;
-    height: 91vh;
+    height: 90vh;
     background-color: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(10px);
     justify-content: center;
     align-items: center;
     padding: 50px;
+    margin-top: 30px; 
   }
   
   .content-wrapper {
